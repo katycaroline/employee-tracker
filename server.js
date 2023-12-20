@@ -2,20 +2,21 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
-    {
-      host: 'localhost',
-      dialect: 'mysql',
-      port: process.env.PORT || 3001,
-    }
-  );
+  const con = mysql.createConnection({
+    host: 'localhost',
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: 3001
+  });
 
-sequelize.sync({ force: false }).then(() => {
-    app.listen(PORT, () => console.log('Now listening'));
-});
+  con.connect((err) => {
+    if(err){
+      console.log('Error connecting to Db');
+      return;
+    }
+    console.log('Connection established');
+  });
 
 function init(){
     inquirer.prompt([
@@ -50,6 +51,51 @@ function init(){
                 break;
         }
     })
+};
+
+function viewDepartments(){
+    const con = mysql.createConnection({
+        host: 'localhost',
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+      })
+      con.query('SELECT * FROM departments', (err,rows) => {
+        if(err) throw err;
+      
+        console.log('Data received from database:');
+        console.log(rows);
+      });
+};
+
+function viewRoles(){
+    const con = mysql.createConnection({
+        host: 'localhost',
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+      })
+      con.query('SELECT * FROM roles', (err,rows) => {
+        if(err) throw err;
+      
+        console.log('Data received from database:');
+        console.log(rows);
+      });
+};
+
+function viewEmployees(){
+    const con = mysql.createConnection({
+        host: 'localhost',
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+      })
+      con.query('SELECT * FROM employees', (err,rows) => {
+        if(err) throw err;
+      
+        console.log('Data received from database:');
+        console.log(rows);
+      });
 };
 
 init();
