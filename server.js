@@ -1,15 +1,21 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+const Sequelize = require('sequelize');
 
-const db = mysql.createConnection(
+const sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
     {
-        host: "local",
-        port: "3001",
-        user: "root",
-        password: "",
-        database: "",
+      host: 'localhost',
+      dialect: 'mysql',
+      port: process.env.PORT || 3001,
     }
-);
+  );
+
+sequelize.sync({ force: false }).then(() => {
+    app.listen(PORT, () => console.log('Now listening'));
+});
 
 function init(){
     inquirer.prompt([
