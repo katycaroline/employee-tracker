@@ -1,31 +1,24 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+const sequelize = require('./config/connection');
 
-  const con = mysql.createConnection({
-    host: "localhost",
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    port: 3001
-  });
-
-  con.connect((err) => {
-    if(err){
-      console.log("Error connecting to Db");
-      return;
-    }
-    console.log("Connection established");
-  });
+init();
 
 function init(){
-    inquirer.prompt([
+  loadPrompts();
+};
+
+ function loadPrompts(){
+      inquirer.prompt([
         {
             type: "list",
             name: "choices",
             message: "What do you want to do?",
             choices: ["View all departments","View all roles","View all employees","Add a department","Add a role","Add an employee","Update an employee role"]
         }
-    ]).then((choice) => {
+    ])
+    .then((choice) => {
+      console.log(choice);
         switch (choice.choices){
             case "View all departments":
                 viewDepartments();
@@ -48,65 +41,44 @@ function init(){
             case "Update an employee role":
                 updateEmployeeRole();
                 break;
+            //case "Exit":
+              //process.exit;
+              default: console.log("hello");
         }
     })
 };
 
 function viewDepartments(){
-    const con = mysql.createConnection({
-        host: "localhost",
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-      })
-      con.query("SELECT * FROM departments", (err,rows) => {
+      mysql.query("SELECT * FROM departments", (err,rows) => {
         if(err) throw err;
       
         console.log("Data received from database:");
         console.log(rows);
-      
+        init();
       });
 };
 
 function viewRoles(){
-    const con = mysql.createConnection({
-        host: "localhost",
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-      })
-      con.query("SELECT * FROM roles", (err,rows) => {
+      mysql.query("SELECT * FROM roles", (err,rows) => {
         if(err) throw err;
       
         console.log("Data received from database:");
         console.log(rows);
-        
+        init();
       });
 };
 
 function viewEmployees(){
-    const con = mysql.createConnection({
-        host: "localhost",
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-      })
-      con.query("SELECT * FROM employees", (err,rows) => {
+      mysql.query("SELECT * FROM employees", (err,rows) => {
         if(err) throw err;
       
         console.log("Data received from database:");
         console.log(rows);
-        
+        init();
       });
 };
 
 function addDepartment(){
-  const con = mysql.createConnection({
-    host: "localhost",
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  })
     const question = [
       {
         type: "input",
@@ -117,11 +89,11 @@ function addDepartment(){
 
     inquirer.prompt(question)
       .then(answer => {
-        con.query(`INSERT INTO departments(name) VALUES('${answer}')`, function (err, row){
+        mysql.query(`INSERT INTO departments(name) VALUES('${answer}')`, function (err, row){
           if (err) {
             console.log(err);
         } else {
-            console.log('DEPARTMENT ADDED TO DATABASE!');
+            console.log('Added department to database!');
             init();
         }
     })
@@ -129,12 +101,6 @@ function addDepartment(){
 };
 
 function addRole(){
-  const con = mysql.createConnection({
-    host: "localhost",
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  })
     const question = [
       {
         type: "input",
@@ -160,7 +126,7 @@ function addRole(){
 
     inquirer.prompt(question)
     .then(answer => {
-      con.query(`INSERT INTO roles(id, title, salary, department_id)
+      mysql.query(`INSERT INTO roles(id, title, salary, department_id)
        VALUES('${answer.id}','${answer.title}','${answer.salary}','${answer.departmentId}')`, function (err, row){
         if(err) throw err;
 
@@ -171,12 +137,6 @@ function addRole(){
 };
 
 function addEmployee(){
-  const con = mysql.createConnection({
-    host: "localhost",
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  })
     const question = [
       {
         type: "input",
@@ -207,7 +167,7 @@ function addEmployee(){
 
     inquirer.prompt(question)
     .then(answer => {
-      con.query(`INSERT INTO employees(id, first_name, last_name, role_id, manager_id)
+      mysql.query(`INSERT INTO employees(id, first_name, last_name, role_id, manager_id)
        VALUES('${answer.id}','${answer.firstName}','${answer.lastName}','${answer.roleId}','${answer.managerId}')`, function (err, row){
         if(err) throw err;
 
@@ -217,4 +177,4 @@ function addEmployee(){
     
 };
 
-init();
+
